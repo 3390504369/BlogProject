@@ -48,7 +48,7 @@
           <button class="add-btn" @click="addTech">添加</button>
         </div>
         <div v-if="profile.techStack.length" class="tech-tags">
-          <span v-for="(tech, index) in profile.techStack" :key="index" class="tech-tag">
+          <span v-for="tech in profile.techStack" :key="tech" class="tech-tag">
             {{ tech }}
             <button class="tag-remove" @click="removeTech(index)">&times;</button>
           </span>
@@ -58,7 +58,7 @@
 
       <!-- 操作按钮 -->
       <div class="form-actions">
-        <button class="save-btn" @click="saveSettings">保存</button>
+        <span class="auto-save-hint">修改已自动保存</span>
         <button class="reset-btn" @click="confirmReset">恢复默认</button>
       </div>
 
@@ -87,6 +87,11 @@ function triggerUpload() {
 function handleFileChange(e) {
   const file = e.target.files?.[0]
   if (!file) return
+  if (file.size > 500 * 1024) {
+    showToastMsg('图片大小不能超过 500KB')
+    e.target.value = ''
+    return
+  }
   const reader = new FileReader()
   reader.onload = (ev) => {
     updateProfile({ avatar: ev.target.result })
@@ -112,10 +117,6 @@ function removeTech(index) {
   const updated = [...profile.techStack]
   updated.splice(index, 1)
   updateProfile({ techStack: updated })
-}
-
-function saveSettings() {
-  showToastMsg('设置已保存')
 }
 
 function confirmReset() {
@@ -399,27 +400,15 @@ function showToastMsg(msg) {
 /* Form Actions */
 .form-actions {
   display: flex;
+  align-items: center;
   gap: 12px;
   padding-top: 4px;
 }
 
-.save-btn {
-  padding: 12px 32px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  border: none;
-  border-radius: 10px;
-  color: white;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
-}
-
-.save-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px rgba(0, 212, 255, 0.35);
+.auto-save-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 .reset-btn {
@@ -492,10 +481,10 @@ function showToastMsg(msg) {
   }
 
   .form-actions {
-    flex-direction: column;
+    flex-direction: row-reverse;
+    justify-content: space-between;
   }
 
-  .save-btn,
   .reset-btn {
     width: 100%;
     text-align: center;
