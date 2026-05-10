@@ -71,7 +71,9 @@ const navItems = [
   { path: '/', name: '首页', icon: '⌂' },
   { path: '/articles', name: '文章', icon: '☰' },
   { path: '/archive', name: '归档', icon: '◈' },
-  { path: '/about', name: '关于', icon: '◉' }
+  { path: '/admin', name: '管理', icon: '⬡' },
+  { path: '/about', name: '关于', icon: '◉' },
+  { path: '/settings', name: '设置', icon: '⚙' }
 ]
 
 const cursorX = ref(0)
