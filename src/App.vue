@@ -1,10 +1,8 @@
 <template>
   <div class="app" @mousemove="handleMouseMove">
     <div class="bg-container">
+      <canvas ref="bgCanvas" class="bg-canvas"></canvas>
       <div class="bg-grid"></div>
-      <div class="bg-stars">
-        <span v-for="n in 80" :key="n" class="star" :style="getStarStyle(n)"></span>
-      </div>
       <div class="bg-orb orb-1"></div>
       <div class="bg-orb orb-2"></div>
       <div class="bg-orb orb-3"></div>
@@ -12,13 +10,6 @@
       <div class="bg-orb orb-5"></div>
       <div class="bg-orb orb-6"></div>
       <div class="bg-mesh"></div>
-      <div class="bg-noise"></div>
-      <div class="bg-particles">
-        <span v-for="n in 30" :key="n" class="particle" :style="getParticleStyle(n)"></span>
-      </div>
-      <div class="bg-lines">
-        <span v-for="n in 12" :key="n" class="bg-line" :style="getLineStyle(n)"></span>
-      </div>
       <div class="bg-scanline"></div>
       <div class="bg-vignette"></div>
       <div class="cursor-glow" :style="cursorStyle"></div>
@@ -32,10 +23,10 @@
             <span class="logo-bracket">]</span>
           </router-link>
           <nav class="nav">
-            <router-link 
-              v-for="item in navItems" 
-              :key="item.path" 
-              :to="item.path" 
+            <router-link
+              v-for="item in navItems"
+              :key="item.path"
+              :to="item.path"
               class="nav-link"
             >
               <span class="nav-icon">{{ item.icon }}</span>
@@ -55,7 +46,7 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-right">
-            <span class="footer-year">© 2024</span>
+            <span class="footer-year">&copy; 2024</span>
           </div>
         </div>
       </div>
@@ -64,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import SearchBox from './components/SearchBox.vue'
 
 const navItems = [
@@ -76,68 +67,153 @@ const navItems = [
   { path: '/settings', name: '设置', icon: '⚙' }
 ]
 
-const cursorX = ref(0)
-const cursorY = ref(0)
-const cursorStyle = ref({
-  left: '0px',
-  top: '0px'
+// Cursor glow
+const cursorStyle = ref({ left: '0px', top: '0px' })
+let cursorRAF = null
+const handleMouseMove = (e) => {
+  if (cursorRAF) return
+  cursorRAF = requestAnimationFrame(() => {
+    cursorStyle.value = { left: `${e.clientX}px`, top: `${e.clientY}px` }
+    cursorRAF = null
+  })
+}
+
+// Canvas background — replaces DOM stars/particles/lines
+const bgCanvas = ref(null)
+let animId = null
+let canvasCtx = null
+let stars = []
+let particles = []
+let lines = []
+
+const STAR_COUNT = 60
+const PARTICLE_COUNT = 20
+const LINE_COUNT = 8
+const COLORS = ['#00dcff', '#7c3aed', '#00ffff', '#ff0080', '#ff6600', '#ffffff']
+
+function rand(min, max) { return Math.random() * (max - min) + min }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)] }
+
+function initCanvasData(w, h) {
+  stars = Array.from({ length: STAR_COUNT }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: rand(1, 3),
+    color: pick(COLORS),
+    speed: rand(0.3, 1.2),
+    phase: Math.random() * Math.PI * 2
+  }))
+  particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: rand(2, 4),
+    color: pick(COLORS),
+    speed: rand(0.2, 0.6),
+    drift: rand(-0.3, 0.3),
+    opacity: 0
+  }))
+  lines = Array.from({ length: LINE_COUNT }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    len: rand(80, 250),
+    speed: rand(0.4, 1.0),
+    opacity: 0
+  }))
+}
+
+function draw(now) {
+  const cw = bgCanvas.value.width
+  const ch = bgCanvas.value.height
+  canvasCtx.clearRect(0, 0, cw, ch)
+
+  // Stars
+  for (const s of stars) {
+    const alpha = 0.2 + 0.6 * ((Math.sin(now * 0.001 * s.speed + s.phase) + 1) / 2)
+    canvasCtx.beginPath()
+    canvasCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
+    canvasCtx.fillStyle = s.color
+    canvasCtx.globalAlpha = alpha
+    canvasCtx.fill()
+    canvasCtx.shadowColor = s.color
+    canvasCtx.shadowBlur = s.r * 2
+    canvasCtx.fill()
+    canvasCtx.shadowBlur = 0
+  }
+  canvasCtx.globalAlpha = 1
+
+  // Particles
+  for (const p of particles) {
+    p.y -= p.speed
+    p.x += p.drift
+    p.opacity = Math.min(1, p.opacity + 0.02)
+    if (p.y < -10) {
+      p.y = ch + 10
+      p.x = Math.random() * cw
+      p.opacity = 0
+    }
+    if (p.x < 0) p.x = cw
+    if (p.x > cw) p.x = 0
+    canvasCtx.beginPath()
+    canvasCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+    canvasCtx.fillStyle = p.color
+    canvasCtx.globalAlpha = p.opacity * 0.7
+    canvasCtx.fill()
+    canvasCtx.shadowColor = p.color
+    canvasCtx.shadowBlur = p.r * 3
+    canvasCtx.fill()
+    canvasCtx.shadowBlur = 0
+  }
+  canvasCtx.globalAlpha = 1
+
+  // Lines
+  for (const l of lines) {
+    l.y += l.speed
+    l.opacity = Math.min(0.7, l.opacity + 0.03)
+    if (l.y > ch + l.len) {
+      l.y = -l.len
+      l.x = Math.random() * cw
+      l.opacity = 0
+    }
+    const gradient = canvasCtx.createLinearGradient(0, l.y, 0, l.y + l.len)
+    gradient.addColorStop(0, 'rgba(0, 220, 255, 0)')
+    gradient.addColorStop(0.5, `rgba(0, 220, 255, ${l.opacity})`)
+    gradient.addColorStop(1, 'rgba(0, 220, 255, 0)')
+    canvasCtx.beginPath()
+    canvasCtx.moveTo(l.x, l.y)
+    canvasCtx.lineTo(l.x, l.y + l.len)
+    canvasCtx.strokeStyle = gradient
+    canvasCtx.lineWidth = 1.5
+    canvasCtx.stroke()
+  }
+
+  animId = requestAnimationFrame(draw)
+}
+
+function resizeCanvas() {
+  const el = bgCanvas.value
+  if (!el) return
+  el.width = window.innerWidth
+  el.height = window.innerHeight
+  initCanvasData(el.width, el.height)
+}
+
+let resizeTimer = null
+function onResize() {
+  clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(resizeCanvas, 150)
+}
+
+onMounted(() => {
+  canvasCtx = bgCanvas.value.getContext('2d')
+  resizeCanvas()
+  animId = requestAnimationFrame(draw)
+  window.addEventListener('resize', onResize)
 })
 
-const handleMouseMove = (e) => {
-  cursorX.value = e.clientX
-  cursorY.value = e.clientY
-  cursorStyle.value = {
-    left: `${e.clientX}px`,
-    top: `${e.clientY}px`
-  }
-}
-
-const getStarStyle = (n) => {
-  const x = (n * 47 + n * 13) % 100
-  const y = (n * 37 + n * 23) % 100
-  const size = 2 + (n % 4)
-  const duration = 1.5 + (n % 3)
-  const delay = (n * 0.2) % 4
-  const colors = ['#00d4ff', '#7c3aed', '#00ffff', '#ff0080', '#ffffff']
-  const color = colors[n % colors.length]
-  return {
-    left: `${x}%`,
-    top: `${y}%`,
-    width: `${size}px`,
-    height: `${size}px`,
-    '--duration': `${duration}s`,
-    '--star-color': color,
-    animationDelay: `${delay}s`
-  }
-}
-
-const getParticleStyle = (n) => {
-  const x = (n * 67) % 100
-  const duration = 8 + (n * 1.5) % 12
-  const delay = (n * 0.8) % 10
-  const size = 3 + (n % 3)
-  const colors = ['#00d4ff', '#7c3aed', '#00ffff', '#ff0080', '#ff6600']
-  const color = colors[n % colors.length]
-  return {
-    left: `${x}%`,
-    '--duration': `${duration}s`,
-    '--particle-color': color,
-    animationDelay: `${delay}s`,
-    width: `${size}px`,
-    height: `${size}px`
-  }
-}
-
-const getLineStyle = (n) => {
-  const x = (n * 31 + n * 7) % 100
-  const duration = 6 + (n * 1.2) % 8
-  const delay = (n * 0.5) % 6
-  return {
-    left: `${x}%`,
-    '--duration': `${duration}s`,
-    animationDelay: `${delay}s`
-  }
-}
+onUnmounted(() => {
+  if (animId) cancelAnimationFrame(animId)
+  window.removeEventListener('resize', onResize)
+})
 </script>
 
 <style scoped>
@@ -155,6 +231,11 @@ const getLineStyle = (n) => {
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding: 16px 0;
+}
+
+[data-theme="light"] .header {
+  background: rgba(245, 245, 248, 0.85);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .header-content {
@@ -202,7 +283,7 @@ const getLineStyle = (n) => {
 .nav-link:hover,
 .nav-link.router-link-active {
   color: var(--primary);
-  background: rgba(0, 212, 255, 0.08);
+  background: rgba(0, 220, 255, 0.08);
 }
 
 .nav-icon {
@@ -218,6 +299,10 @@ const getLineStyle = (n) => {
   padding: 32px 0;
   margin-top: 48px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .footer-content {

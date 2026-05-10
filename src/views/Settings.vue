@@ -56,6 +56,29 @@
         <p v-else class="empty-hint">暂无技术标签，添加一个吧</p>
       </div>
 
+      <!-- 主题设置 -->
+      <div class="form-section">
+        <label class="form-label">主题模式</label>
+        <div class="theme-toggle">
+          <button
+            class="theme-option"
+            :class="{ active: currentTheme === 'dark' }"
+            @click="setThemeMode('dark')"
+          >
+            <span class="theme-icon">◈</span>
+            <span class="theme-label">暗色</span>
+          </button>
+          <button
+            class="theme-option"
+            :class="{ active: currentTheme === 'light' }"
+            @click="setThemeMode('light')"
+          >
+            <span class="theme-icon">◎</span>
+            <span class="theme-label">亮色</span>
+          </button>
+        </div>
+      </div>
+
       <!-- 操作按钮 -->
       <div class="form-actions">
         <span class="auto-save-hint">修改已自动保存</span>
@@ -71,14 +94,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useProfile } from '../composables/useProfile'
+
+const THEME_KEY = 'blog-theme'
 
 const { profile, updateProfile, resetProfile } = useProfile()
 const fileInput = ref(null)
 const newTech = ref('')
 const showToast = ref(false)
 const toastMessage = ref('')
+const currentTheme = ref('dark')
+
+onMounted(() => {
+  currentTheme.value = localStorage.getItem(THEME_KEY) || 'dark'
+  document.documentElement.setAttribute('data-theme', currentTheme.value)
+})
+
+function setThemeMode(mode) {
+  currentTheme.value = mode
+  localStorage.setItem(THEME_KEY, mode)
+  document.documentElement.setAttribute('data-theme', mode)
+}
 
 function triggerUpload() {
   fileInput.value?.click()
@@ -457,6 +494,47 @@ function showToastMsg(msg) {
 .fade-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(10px);
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  display: flex;
+  gap: 12px;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--surface-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-option:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.theme-option.active {
+  background: rgba(0, 220, 255, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 20px rgba(0, 220, 255, 0.15);
+}
+
+.theme-icon {
+  font-size: 1.2rem;
+}
+
+.theme-label {
+  font-weight: 500;
 }
 
 /* Responsive */

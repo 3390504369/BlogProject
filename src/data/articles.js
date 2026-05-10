@@ -213,6 +213,15 @@ export const categories = [
   { name: 'DevOps', count: 1 }
 ]
 
+export const categoryColors = {
+  '前端开发': { gradient: 'linear-gradient(135deg, #00d4ff, #00ffff)', primary: '#00d4ff', glow: 'rgba(0, 212, 255, 0.15)', bg: 'rgba(0, 212, 255, 0.12)' },
+  '后端开发': { gradient: 'linear-gradient(135deg, #00c853, #00e676)', primary: '#00c853', glow: 'rgba(0, 200, 83, 0.15)', bg: 'rgba(0, 200, 83, 0.12)' },
+  '开发工具': { gradient: 'linear-gradient(135deg, #ff6d00, #ff9100)', primary: '#ff6d00', glow: 'rgba(255, 109, 0, 0.15)', bg: 'rgba(255, 109, 0, 0.12)' },
+  'DevOps': { gradient: 'linear-gradient(135deg, #7c3aed, #e040fb)', primary: '#7c3aed', glow: 'rgba(124, 58, 237, 0.15)', bg: 'rgba(124, 58, 237, 0.12)' },
+}
+
+export const defaultCategoryColor = { gradient: 'linear-gradient(135deg, var(--primary), var(--secondary))', primary: 'var(--primary)', glow: 'rgba(0, 212, 255, 0.1)', bg: 'rgba(0, 220, 255, 0.1)' }
+
 export const tags = [
   { name: 'Vue', count: 1 },
   { name: 'JavaScript', count: 2 },

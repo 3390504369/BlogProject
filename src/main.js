@@ -11,4 +11,8 @@ import 'prismjs/components/prism-python'
 
 window.Prism = Prism
 
+// Initialize theme on startup
+const savedTheme = localStorage.getItem('blog-theme') || 'dark'
+document.documentElement.setAttribute('data-theme', savedTheme)
+
 createApp(App).use(router).mount('#app')

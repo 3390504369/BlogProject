@@ -103,8 +103,8 @@ const filteredArticles = computed(() => {
 
 .page-header {
   position: relative;
-  padding: 50px 0;
-  margin-bottom: 40px;
+  padding: 40px 0 30px;
+  margin-bottom: 30px;
   overflow: hidden;
 }
 
@@ -177,12 +177,12 @@ const filteredArticles = computed(() => {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 20px 24px;
+  padding: 18px 24px;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  margin-bottom: 35px;
+  border-radius: 14px;
+  margin-bottom: 32px;
 }
 
 .filter-label {
@@ -190,8 +190,11 @@ const filteredArticles = computed(() => {
   align-items: center;
   gap: 8px;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   white-space: nowrap;
+  font-weight: 600;
+  padding-right: 20px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .filter-icon {
@@ -248,9 +251,10 @@ const filteredArticles = computed(() => {
 }
 
 .article-item:hover {
-  transform: translateX(8px);
+  transform: translateX(6px);
   border-color: rgba(0, 212, 255, 0.3);
-  box-shadow: 
+  background: rgba(0, 212, 255, 0.02);
+  box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.2),
     0 0 40px rgba(0, 212, 255, 0.08);
 }
@@ -258,12 +262,12 @@ const filteredArticles = computed(() => {
 .article-line {
   position: absolute;
   left: 0;
-  top: 20px;
-  bottom: 20px;
+  top: 22px;
+  bottom: 22px;
   width: 3px;
   background: linear-gradient(180deg, var(--primary), var(--secondary));
   border-radius: 2px;
-  opacity: 0;
+  opacity: 0.2;
   transition: opacity 0.3s ease;
 }
 
@@ -390,19 +394,24 @@ const filteredArticles = computed(() => {
     align-items: flex-start;
     gap: 12px;
   }
-  
+
+  .filter-label {
+    border-right: none;
+    padding-right: 0;
+  }
+
   .page-title {
     font-size: 2rem;
   }
-  
+
   .article-item {
     padding: 20px;
   }
-  
+
   .article-title {
     font-size: 1.2rem;
   }
-  
+
   .read-more {
     display: none;
   }
