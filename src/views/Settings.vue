@@ -48,7 +48,7 @@
           <button class="add-btn" @click="addTech">添加</button>
         </div>
         <div v-if="profile.techStack.length" class="tech-tags">
-          <span v-for="tech in profile.techStack" :key="tech" class="tech-tag">
+          <span v-for="(tech, index) in profile.techStack" :key="tech" class="tech-tag">
             {{ tech }}
             <button class="tag-remove" @click="removeTech(index)">&times;</button>
           </span>
