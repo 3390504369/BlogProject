@@ -82,7 +82,7 @@ const groupedArticles = computed(() => {
 
 <style scoped>
 .archive {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -122,13 +122,13 @@ const groupedArticles = computed(() => {
 
 .timeline {
   position: relative;
-  padding-left: 40px;
+  padding-left: 60px;
 }
 
 .timeline::before {
   content: '';
   position: absolute;
-  left: 8px;
+  left: 28px;
   top: 0;
   bottom: 0;
   width: 2px;
@@ -142,7 +142,7 @@ const groupedArticles = computed(() => {
 
 .year-marker {
   position: absolute;
-  left: -40px;
+  left: -60px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -263,15 +263,15 @@ const groupedArticles = computed(() => {
 
 @media (max-width: 768px) {
   .timeline {
-    padding-left: 30px;
+    padding-left: 44px;
   }
   
   .timeline::before {
-    left: 3px;
+    left: 17px;
   }
   
   .year-marker {
-    left: -30px;
+    left: -44px;
   }
   
   .year-dot {
