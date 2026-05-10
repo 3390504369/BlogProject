@@ -30,7 +30,7 @@ export function useProfile() {
   }
 
   function resetProfile() {
-    Object.assign(profile, defaultProfile)
+    Object.assign(profile, { ...defaultProfile })
     localStorage.removeItem(STORAGE_KEY)
   }
 
