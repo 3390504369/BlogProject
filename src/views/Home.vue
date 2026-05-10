@@ -1,40 +1,12 @@
 <template>
   <div class="home">
-    <section class="hero">
-      <div class="hero-bg">
-        <div class="hero-orb hero-orb-1"></div>
-        <div class="hero-orb hero-orb-2"></div>
-        <div class="hero-grid"></div>
+    <section class="profile-header">
+      <div class="profile-avatar">
+        <img v-if="profile.avatar" :src="profile.avatar" alt="avatar" class="avatar-img" />
+        <span v-else class="avatar-icon">◈</span>
       </div>
-      <div class="hero-content">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          <span>Welcome to my digital space</span>
-        </div>
-        <h1 class="hero-title">
-          <span class="hero-line">记录</span>
-          <span class="hero-line gradient-text">技术成长</span>
-        </h1>
-        <p class="hero-subtitle">
-          全栈开发者的技术博客，分享前端、后端、DevOps 等领域的实践与思考
-        </p>
-        <div class="hero-stats">
-          <div class="stat-item">
-            <span class="stat-value">{{ articles.length }}</span>
-            <span class="stat-label">篇文章</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-value">{{ categories.length }}</span>
-            <span class="stat-label">个分类</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-value">{{ totalTags }}</span>
-            <span class="stat-label">个标签</span>
-          </div>
-        </div>
-      </div>
+      <h1 class="profile-name">{{ profile.name }}</h1>
+      <p class="profile-title">{{ profile.title }}</p>
     </section>
 
     <section class="featured-articles">
@@ -103,35 +75,20 @@
           </li>
         </ul>
       </div>
-
-      <div class="widget tags-widget">
-        <div class="widget-header">
-          <span class="widget-icon">#</span>
-          <h3>标签云</h3>
-        </div>
-        <div class="tag-cloud">
-          <span 
-            v-for="tag in tags" 
-            :key="tag.name" 
-            class="tag-item"
-          >
-            <router-link :to="`/tag/${tag.name}`">{{ tag.name }}</router-link>
-          </span>
-        </div>
-      </div>
     </section>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { articles, categories, tags } from '../data/articles'
+import { articles, categories } from '../data/articles'
+import { useProfile } from '../composables/useProfile'
+
+const { profile } = useProfile()
 
 const latestArticles = computed(() => {
   return [...articles].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3)
 })
-
-const totalTags = computed(() => tags.length)
 </script>
 
 <style scoped>
@@ -141,150 +98,47 @@ const totalTags = computed(() => tags.length)
   gap: 50px;
 }
 
-.hero {
+/* Profile header */
+.profile-header {
   grid-column: 1 / -1;
-  position: relative;
-  padding: 50px 0;
+  text-align: center;
+  padding: 40px 0 30px;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
   overflow: hidden;
-}
-
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hero-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
-}
-
-.hero-orb-1 {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
-  top: -100px;
-  right: 10%;
-  animation: float 8s ease-in-out infinite;
-}
-
-.hero-orb-2 {
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
-  bottom: -50px;
-  left: 5%;
-  animation: float 10s ease-in-out infinite reverse;
-}
-
-.hero-grid {
-  position: absolute;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.hero-badge {
-  display: inline-flex;
+  border: 2px solid transparent;
+  background: linear-gradient(var(--bg-dark), var(--bg-dark)) padding-box,
+              linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(0, 212, 255, 0.08);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 20px;
-  font-size: 0.85rem;
+  justify-content: center;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-icon {
+  font-size: 2.2rem;
   color: var(--primary);
-  margin-bottom: 20px;
-  font-family: 'JetBrains Mono', monospace;
 }
 
-.badge-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--primary);
-  border-radius: 50%;
-  animation: pulse-glow 2s infinite;
-}
-
-.hero-title {
-  font-size: 2.8rem;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 18px;
-}
-
-.hero-line {
-  display: block;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 200%;
-  animation: gradient-shift 5s ease infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.hero-subtitle {
-  font-size: 1.05rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 28px;
-  max-width: 550px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.hero-stats {
-  display: inline-flex;
-  align-items: center;
-  gap: 30px;
-  padding: 20px 40px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-value {
-  display: block;
+.profile-name {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
-  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 6px;
 }
 
-.stat-label {
-  font-size: 0.85rem;
+.profile-title {
   color: var(--text-secondary);
-}
-
-.stat-divider {
-  width: 1px;
-  height: 40px;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  font-size: 1rem;
 }
 
 .section-header {
@@ -547,54 +401,22 @@ const totalTags = computed(() => tags.length)
   font-family: 'JetBrains Mono', monospace;
 }
 
-.tag-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag-item {
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  font-size: 0.85rem;
-  transition: all 0.3s ease;
-}
-
-.tag-item:hover {
-  background: rgba(0, 212, 255, 0.1);
-  border-color: rgba(0, 212, 255, 0.3);
-}
-
-.tag-item a {
-  color: var(--text-secondary);
-}
-
-.tag-item:hover a {
-  color: var(--primary);
-}
-
 @media (max-width: 900px) {
   .home {
     grid-template-columns: 1fr;
   }
   
-  .hero {
-    padding: 35px 0;
+  .profile-header {
+    padding: 30px 0 20px;
   }
-  
-  .hero-title {
-    font-size: 2.2rem;
+
+  .profile-name {
+    font-size: 1.5rem;
   }
-  
-  .hero-stats {
-    padding: 14px 20px;
-    gap: 20px;
-  }
-  
-  .stat-value {
-    font-size: 1.3rem;
+
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
   }
 }
 </style>
