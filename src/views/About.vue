@@ -4,11 +4,12 @@
       <div class="avatar-container">
         <div class="avatar-ring"></div>
         <div class="avatar">
-          <span>◈</span>
+          <img v-if="profile.avatar" :src="profile.avatar" alt="avatar" class="about-avatar-img" />
+          <span v-else>◈</span>
         </div>
       </div>
-      <h1 class="name">开发者</h1>
-      <p class="title">全栈工程师 · 技术博主</p>
+      <h1 class="name">{{ profile.name }}</h1>
+      <p class="title">{{ profile.title }}</p>
       <div class="status">
         <span class="status-dot"></span>
         <span>活跃开发中</span>
@@ -22,14 +23,7 @@
           <h2>关于我</h2>
         </div>
         <div class="section-content">
-          <p>
-            你好！我是一名热爱技术的全栈开发者，专注于 Web 开发领域。
-            拥有多年的前端和后端开发经验，对新技术保持着浓厚的兴趣。
-          </p>
-          <p>
-            这个博客是我记录技术成长、分享编程心得的空间。
-           希望通过分享，与更多志同道合的朋友交流学习。
-          </p>
+          <p>{{ profile.bio }}</p>
         </div>
       </section>
 
@@ -38,46 +32,12 @@
           <span class="section-icon">◈</span>
           <h2>技术栈</h2>
         </div>
-        <div class="tech-grid">
-          <div class="tech-category">
-            <div class="category-header">
-              <span class="category-icon">⟨⟩</span>
-              <h3>前端</h3>
-            </div>
-            <div class="tech-items">
-              <span class="tech-item">Vue.js</span>
-              <span class="tech-item">React</span>
-              <span class="tech-item">TypeScript</span>
-              <span class="tech-item">CSS3</span>
-              <span class="tech-item">Vite</span>
-            </div>
-          </div>
-          <div class="tech-category">
-            <div class="category-header">
-              <span class="category-icon">◈</span>
-              <h3>后端</h3>
-            </div>
-            <div class="tech-items">
-              <span class="tech-item">Node.js</span>
-              <span class="tech-item">Python</span>
-              <span class="tech-item">Go</span>
-              <span class="tech-item">MySQL</span>
-              <span class="tech-item">MongoDB</span>
-            </div>
-          </div>
-          <div class="tech-category">
-            <div class="category-header">
-              <span class="category-icon">⬡</span>
-              <h3>DevOps</h3>
-            </div>
-            <div class="tech-items">
-              <span class="tech-item">Docker</span>
-              <span class="tech-item">Git</span>
-              <span class="tech-item">CI/CD</span>
-              <span class="tech-item">Nginx</span>
-            </div>
-          </div>
+        <div v-if="profile.techStack.length" class="tech-items-wrapper">
+          <span v-for="tech in profile.techStack" :key="tech" class="tech-item">
+            {{ tech }}
+          </span>
         </div>
+        <p v-else class="empty-hint">暂无技术栈信息</p>
       </section>
 
       <section class="section">
@@ -114,6 +74,8 @@
 </template>
 
 <script setup>
+import { useProfile } from '../composables/useProfile'
+const { profile } = useProfile()
 </script>
 
 <style scoped>
@@ -300,6 +262,19 @@
 .tech-item:hover {
   background: rgba(0, 212, 255, 0.2);
   border-color: rgba(0, 212, 255, 0.4);
+}
+
+.tech-items-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.about-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .contact-grid {
