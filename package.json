@@ -1,0 +1,20 @@
+{
+  "name": "personal-blog",
+  "version": "1.0.0",
+  "description": "Personal Blog",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "fuse.js": "^7.3.0",
+    "prismjs": "^1.30.0",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.1.6"
+  }
+}
